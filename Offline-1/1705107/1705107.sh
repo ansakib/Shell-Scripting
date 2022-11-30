@@ -45,23 +45,54 @@ for ((i=1805121; i<=$max_stID; i++))
 do
     if [[ -d $i ]] ; then
         cd $i
-        chmod +x "$i.sh"
-        #ls -l "$i.sh"
-        bash $i.sh > "$i.txt"
-        count1=$(diff --ignore-all-space "$i.txt" "$root/AcceptedOutput.txt" | grep "<" |wc -l)
-        count2=$(diff --ignore-all-space "$i.txt" "$root/AcceptedOutput.txt" | grep ">" |wc -l)
-        count=$(($count1 + $count2))
-        deduction=$(($count*5))
-        marks=$(($max_score-$deduction))
-        index=$(($i-1805121))
-        if (($marks>0)) ; then
-            marksArray[$index]=$marks
+        if [[ -e $i.sh && -f $i.sh ]] ; then
+            chmod +x "$i.sh"
+            #ls -l "$i.sh"
+            bash $i.sh > "$i.txt"
+            count1=$(diff --ignore-all-space "$i.txt" "$root/AcceptedOutput.txt" | grep "<" |wc -l)
+            count2=$(diff --ignore-all-space "$i.txt" "$root/AcceptedOutput.txt" | grep ">" |wc -l)
+            count=$(($count1 + $count2))
+            deduction=$(($count*5))
+            marks=$(($max_score-$deduction))
+            index=$(($i-1805121))
+            if (($marks>0)) ; then
+                marksArray[$index]=$marks
+            fi
+            rm "$i.txt"
         fi
-        rm "$i.txt"
         cd ..
-    else 
-        echo "$i did not submit"
+    
     fi
+done
+
+
+
+
+for ((i=1805121; i<=$max_stID; i++))
+do
+    j=$(($i+1))
+    for ((; j<=$max_stID; j++))
+    do
+        if [[ -d $i &&  -d $j && -e $i/$i.sh && -f $i/$i.sh && -e $j/$j.sh && -e $j/$j.sh ]] ; then
+            count1=$(diff -ZB "$i/$i.sh" "$j/$j.sh" | grep "<" |wc -l)
+            count2=$(diff -ZB "$i/$i.sh" "$j/$j.sh" | grep ">" |wc -l)
+            count=$(($count1 + $count2))
+            if [[ $count -eq 0 ]]; then
+                index1=$(($i-1805121))
+                mark1=${marksArray[$index1]}
+                if (($mark1>0)) ; then
+                    marksArray[$index1]=$((0-$mark1))
+                fi
+                
+                index1=$(($j-1805121))
+                mark1=${marksArray[$index1]}
+                if (($mark1>0)) ; then
+                    marksArray[$index1]=$((0-$mark1))
+                fi
+                
+            fi
+        fi    
+    done
 done
 
 for mark in ${marksArray[@]}
