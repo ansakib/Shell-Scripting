@@ -95,6 +95,16 @@ do
     done
 done
 
+cd $root
+
+echo "student_id" , "score" > output.csv
+for ((i=0; i<$max_st; i++))
+do
+    id=$((1805121+$i))
+    sc=${marksArray[$i]}
+    echo $id, $sc >> output.csv
+done
+
 for mark in ${marksArray[@]}
 do
     echo $mark
