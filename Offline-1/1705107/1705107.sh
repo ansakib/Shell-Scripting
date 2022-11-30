@@ -29,7 +29,9 @@ done
 # done
 
 root=$(pwd)
+
 cd Submissions
+
 
 # for dir in $(ls)
 # do
@@ -38,3 +40,31 @@ cd Submissions
 #     ls -l "$dir.sh"
 #     cd ..
 # done
+
+for ((i=1805121; i<=$max_stID; i++))
+do
+    if [[ -d $i ]] ; then
+        cd $i
+        chmod +x "$i.sh"
+        #ls -l "$i.sh"
+        bash $i.sh > "$i.txt"
+        count1=$(diff --ignore-all-space "$i.txt" "$root/AcceptedOutput.txt" | grep "<" |wc -l)
+        count2=$(diff --ignore-all-space "$i.txt" "$root/AcceptedOutput.txt" | grep ">" |wc -l)
+        count=$(($count1 + $count2))
+        deduction=$(($count*5))
+        marks=$(($max_score-$deduction))
+        index=$(($i-1805121))
+        if (($marks>0)) ; then
+            marksArray[$index]=$marks
+        fi
+        rm "$i.txt"
+        cd ..
+    else 
+        echo "$i did not submit"
+    fi
+done
+
+for mark in ${marksArray[@]}
+do
+    echo $mark
+done
